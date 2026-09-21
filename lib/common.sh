@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [[ -n "${_ASEPRITE_INSTALLER_COMMON_SH}" ]]; then
+    return 0
+fi
+_ASEPRITE_INSTALLER_COMMON_SH=1
+
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
     C_RED=$'\033[0;31m'
     C_GREEN=$'\033[0;32m'
@@ -20,3 +25,4 @@ die() {
     log_error "$*"
     exit 1
 }
+
