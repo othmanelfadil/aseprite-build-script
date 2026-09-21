@@ -26,3 +26,12 @@ die() {
     exit 1
 }
 
+confirm() {
+    local prompt="$1"
+    if [[ "${ASSUME_YES:-0}" == "1" ]]; then
+        return 0
+    fi
+    local reply 
+    read -r -p "$prompt [y/n] " reply </dev/ty || reply=""
+    [[ "$reply" =~ ^[Yy]$ ]]
+}
