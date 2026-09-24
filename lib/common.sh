@@ -59,3 +59,8 @@ version_ge() {
     highest=$(printf '%s\n%s\n' "$a" "$b" | sort -V | tail -n1)
     [[  "$highest" == "$a" ]]
 }
+
+free_space() {
+    local path="$1"
+    df -Pk "$path" 2>/dev/null | awk 'NR==2 {printf "%d", $4/1024/1024 }'
+}
