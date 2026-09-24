@@ -51,3 +51,11 @@ run_sudo() {
         sudo "$@"
     fi 
 }
+
+version_ge() {
+    local a="${1#v}" b="${2#v}"
+    [[ "$a" == "$b" ]] && return 0
+    local highest
+    highest=$(printf '%s\n%s\n' "$a" "$b" | sort -V | tail -n1)
+    [[  "$highest" == "$a" ]]
+}
