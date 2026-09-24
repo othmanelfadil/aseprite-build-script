@@ -31,3 +31,31 @@ detect_os() {
             die "unsupported OS: $uname_s (this installer supports Linux and macOS)"
             ;;
     esac
+    local m
+    if has_cmd arch; then
+        m="$(arch)"
+    else
+        m="$(uname -m)"
+    fi
+    case "$m" in
+        x86_64|amd64) ARCH="x64" ;;
+        arm64|aarch64) ARCH="arm64" ;;
+        i386|i686) ARCH="x86" ;;
+        *) die "unsupported CPU architecture: $m" ;;
+    esac
+
+    PKG_MANAGER="unknown"
+    if [[ "$OS_KIND" == "macos" ]]; then
+        PKG_MANAGER="brew"
+    else
+        case "$OS_ID" in
+            fedora|rhel|centos|rocky|almalinux) PKG_MANAGER="dnf" ;;
+            ubuntu|debian|linuxmint|pop) PKG_MANAGER="apt" ;;
+            arch|manjaro|endeavouros) PKG_MANAGER="pacman" ;;
+            opensuse*|sles) PKG_MANAGER="zypper" ;;
+            *) PKG_MANAGER="unknown" ;;
+        esac
+    fi
+
+    export OS_KIND OS_ID ARCH PKG_MANAGER
+}
