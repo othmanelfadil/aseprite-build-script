@@ -48,12 +48,27 @@ detect_os() {
     if [[ "$OS_KIND" == "macos" ]]; then
         PKG_MANAGER="brew"
     else
+    # to add more distros 
         case "$OS_ID" in
             fedora|rhel|centos|rocky|almalinux) PKG_MANAGER="dnf" ;;
             ubuntu|debian|linuxmint|pop) PKG_MANAGER="apt" ;;
             arch|manjaro|endeavouros) PKG_MANAGER="pacman" ;;
             opensuse*|sles) PKG_MANAGER="zypper" ;;
-            *) PKG_MANAGER="unknown" ;;
+            *)
++                if [[ "$OS_ID_LIKE" == *fedora* || "$OS_ID_LIKE" == *rhel* ]]; then
++                    PKG_MANAGER="dnf"
++                elif [[ "$OS_ID_LIKE" == *debian* ]]; then
++                    PKG_MANAGER="apt"
++                elif [[ "$OS_ID_LIKE" == *arch* ]]; then
++                    PKG_MANAGER="pacman"
++                elif [[ "$OS_ID_LIKE" == *suse* ]]; then
++                    PKG_MANAGER="zypper"
++                elif has_cmd dnf; then PKG_MANAGER="dnf"
++                elif has_cmd apt-get; then PKG_MANAGER="apt"
++                elif has_cmd pacman; then PKG_MANAGER="pacman"
++                elif has_cmd zypper; then PKG_MANAGER="zypper"
++                fi
++                ;;
         esac
     fi
 
