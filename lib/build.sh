@@ -21,3 +21,15 @@ deps_package_list() {
         *) die "unknown package manager, can't determine dependency list" ;;
     esac
 }
+
+_pkg_installed() {
+    local pkg='$1'
+    case "$PKG_MANAGER" in
+        dnf) rpm -q "$pkg" >/dev/null 2>&1 ;;
+        apt) dpkg -s "$pkg" >/dev/null 2>&1 ;;
+        pacman) pacman "$pkg" >/dev/null 2>&1 ;;
+        zypper) rpm -q "$pkg" >/dev/null 2>&1 ;;
+        brew) brew list --formula "$pkg" >/dev/null 2>&1 ;;
+        *) return 1 ;;
+        esac
+}
