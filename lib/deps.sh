@@ -33,3 +33,30 @@ _pkg_installed() {
         *) return 1 ;;
         esac
 }
+
+install_dependencies() {
+    local all_pkgs missing=()
+    all_pkgs=$(deps_package_list)
+    for pkg in $all_pkgs; do
+        if ! _pkg_installed "$pkg"; then
+            missing+=("$pkg")
+        fi
+    done
+
+    if [[ ${#missing[@]} -eq 0 ]]; then
+        return 0
+    fi
+
+    log_step "installing dependencies: ${missing[*]}"
+    if [[ "${DRY_RUN:-0}" != "1" ]] && ! confirm "install ${#missing[@]} package(s) via ${PKG_MANAGER}?"; then
+        die "dependencies declined, install them manually and re-run with --skip-deps"
+    fi
+
+    case "$PKG_MANAGER" in
+        dnf)    run_sudo dnf install -y "${missing[@]}" ;;
+        apt)    run_sudo apt-get update && run_sudo apt-get install -y "${missing[@]}" ;;
+        pacman) run_sudo pacman -Sy --needed --noconfirm "${missing[@]}" ;;
+        zypper) run_sudo zypper install -y "${missing[@]}" ;;
+        brew)   run brew install "${missing[@]}" ;;
+    esac
+}
