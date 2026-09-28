@@ -5,11 +5,11 @@ if [[ -n "${_ASEPRITE_INSTALLER_DEPS_SH:-}" ]]; then
 fi
 _ASEPRITE_INSTALLER_DEPS_SH=1
 
-_deps_for_dnf()    { echo "gcc-c++ clang libcxx-devel cmake ninja-build unzip curl git libX11-devel libXcursor-devel libXi-devel libXrandr-devel mesa-libGL-devel fontconfig-devel"; }
-_deps_for_apt()    { echo "g++ clang cmake ninja-build unzip curl git libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev libfontconfig1-dev"; }
-_deps_for_pacman() { echo "gcc clang cmake ninja unzip curl git libx11 libxcursor libxi libxrandr mesa fontconfig libwebp"; }
-_deps_for_zypper() { echo "gcc-c++ clang cmake ninja unzip curl git libX11-devel libXcursor-devel libXi-devel libXrandr-devel Mesa-libGL-devel fontconfig-devel"; }
-_deps_for_brew()   { echo "cmake ninja"; }
+_deps_for_dnf()    { echo "gcc-c++ clang libcxx-devel cmake ninja-build unzip curl git ccache libX11-devel libXcursor-devel libXi-devel libXrandr-devel mesa-libGL-devel fontconfig-devel"; }
+_deps_for_apt()    { echo "g++ clang cmake ninja-build unzip curl git ccache libx11-dev libxcursor-dev libxi-dev libxrandr-dev libgl1-mesa-dev libfontconfig1-dev"; }
+_deps_for_pacman() { echo "gcc clang cmake ninja unzip curl git ccache libx11 libxcursor libxi libxrandr mesa fontconfig libwebp"; }
+_deps_for_zypper() { echo "gcc-c++ clang cmake ninja unzip curl git ccache libX11-devel libXcursor-devel libXi-devel libXrandr-devel Mesa-libGL-devel fontconfig-devel"; }
+_deps_for_brew()   { echo "cmake ninja ccache"; }
 
 deps_package_list() {
     case "$PKG_MANAGER" in
