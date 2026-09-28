@@ -35,6 +35,16 @@ _pkg_installed() {
 }
 
 install_dependencies() {
+    if [[ "$OS_KIND" == "macos" ]]; then
+        if ! has_cmd xcodebuild || ! xcode-select -p >/dev/null 2>&1; then
+            log_warn "xcode command line tools not found, requesting install"
+            run xcode-select --install || true
+            die "re-run this installer once the xcode command line tools finish installing"
+        fi
+        if ! has_cmd brew; then
+            die "homebrew is required to install cmake/ninja on macos, get it from https://brew.sh then re-run"
+        fi
+    fi
     local all_pkgs missing=()
     all_pkgs=$(deps_package_list)
     for pkg in $all_pkgs; do
