@@ -23,15 +23,15 @@ deps_package_list() {
 }
 
 _pkg_installed() {
-    local pkg='$1'
+    local pkg="$1"
     case "$PKG_MANAGER" in
         dnf) rpm -q "$pkg" >/dev/null 2>&1 ;;
         apt) dpkg -s "$pkg" >/dev/null 2>&1 ;;
-        pacman) pacman "$pkg" >/dev/null 2>&1 ;;
+        pacman) pacman -Qi "$pkg" >/dev/null 2>&1 ;;
         zypper) rpm -q "$pkg" >/dev/null 2>&1 ;;
         brew) brew list --formula "$pkg" >/dev/null 2>&1 ;;
         *) return 1 ;;
-        esac
+    esac
 }
 
 install_dependencies() {
@@ -58,7 +58,7 @@ install_dependencies() {
     fi
 
     log_step "installing dependencies: ${missing[*]}"
-    if [[ "${DRY_RUN:-0}" != "1" ]] && ! confirm "install ${#missing[@]} package(s) via ${PKG_MANAGER}?"; then
+    if ! confirm "install ${#missing[@]} package(s) via ${PKG_MANAGER}?"; then
         die "dependencies declined, install them manually and re-run with --skip-deps"
     fi
 
