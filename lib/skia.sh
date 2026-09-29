@@ -19,7 +19,7 @@ skia_platform_label() {
 skia_read_tag() {
     local source_dir="$1"
     local tag_file="$source_dir/laf/misc/skia-tag.txt"
-    [[ -f "$tag_file" ]] || die "cannot find $tag_file"
+    [[ -f "$tag_file" ]] || die "cannot find $tag_file, did the laf submodule get checked out?"
     tr -d '[:space:]' < "$tag_file"
 }
 
@@ -28,6 +28,7 @@ skia_url() {
     local build="${2:-Release}"
     local platform 
     platform=$(skia_platform_label)
+    echo "https://github.com/aseprite/skia/releases/download/${tag}/Skia-${platform}-${build}-${ARCH}.zip"
 }
 
 skia_dir_for_tag() {
