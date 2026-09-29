@@ -22,3 +22,15 @@ skia_read_tag() {
     [[ -f "$tag_file" ]] || die "cannot find $tag_file"
     tr -d '[:space:]' < "$tag_file"
 }
+
+skia_url() {
+    local tag="$1"
+    local build="${2:-Release}"
+    local platform 
+    platform=$(skia_platform_label)
+}
+
+skia_dir_for_tag() {
+    local tag="$1"
+    echo "${SKIA_CACHE_DIR}/${tag}-${OS_KIND}-${ARCH}"
+}
