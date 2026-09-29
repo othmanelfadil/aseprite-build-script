@@ -34,3 +34,29 @@ skia_dir_for_tag() {
     local tag="$1"
     echo "${SKIA_CACHE_DIR}/${tag}-${OS_KIND}-${ARCH}"
 }
+
+ensure_skia() {
+    local source_dir="$1"
+    local tag url zip_path dest_dir
+    tag=$(skia_read_tag "$source_dir")
+    dest_dir=$(skia_dir_for_tag "$tag")
+
+    if [[ -d "$dest_dir" && -n "$(ls - A "$dest_dir" 2>/dev/null)" ]]; then
+        echo "$dest_dir"
+        return 0
+    fi
+
+    url=$(skia_url "$tag")
+    mkdir -p "$SKIA_CACHE_DIR"
+    zip_path="${SKIA_CACHE_DIR}/${tag}-${OS_KIND}-${ARCH}.zip"
+
+    log_step "downloading skia ${tag}" >&2
+    curl -fL --progress-bar -o "$zip_path" "$url"
+
+    rm -rf "$dest_dir"
+    mkdir -p "$dest_dir"
+    unzip -q "$zip_path" -d "$dest_dir"
+    rm -f "$zip_path"
+
+    echo "$dest_dir"
+}
