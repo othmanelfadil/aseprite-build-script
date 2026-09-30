@@ -52,7 +52,18 @@ ensure_skia() {
     zip_path="${SKIA_CACHE_DIR}/${tag}-${OS_KIND}-${ARCH}.zip"
 
     log_step "downloading skia ${tag}" >&2
-    curl -fL --progress-bar -o "$zip_path" "$url"
+    local attempt
+    for attempt in 1 2; do
+        if curl -fL --progress-bar -o "$zip_path" "$url"; then
+            break
+        fi
+        rm -f "$zip_path"
+        if [[ "$attempt" == 2 ]]; then
+            die "failed to download skia from $url after 2 attempts"
+        fi
+        log_warn "download failed, retrying..." >&2
+        sleep 2
+    done
 
     rm -rf "$dest_dir"
     mkdir -p "$dest_dir"
