@@ -47,7 +47,7 @@ build_aseprite() {
 
     log_step "building (${build_type})"
 
-    if [[ -x "source_dir?build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then 
+    if [[ -x "source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then 
         return 0
     fi
 
