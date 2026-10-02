@@ -51,7 +51,7 @@ build_aseprite() {
         if [[ -x "source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then 
             return 0
         fi
-        log_warn "build.sh --auto unavailable, falling to manual mode"
+        log_warn "build.sh --auto unavailable, falling back to manual mode"
     fi
 
     local -a cmake_args=(
