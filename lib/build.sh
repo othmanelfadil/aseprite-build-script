@@ -32,6 +32,8 @@ fetch_source() {
     log_info "ref: ${ref}"
 
     run git -C "$source_dir" checkout --force "$ref"
+    log_step "fecthing submodules"
+    run git -C "$source_dir" submodule update --init --recursive
 
     echo "$ref"
 }
