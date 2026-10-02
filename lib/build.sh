@@ -47,6 +47,10 @@ build_aseprite() {
 
     log_step "building (${build_type})"
 
+    if [[ -x "source_dir?build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then 
+        return 0
+    fi
+
     local -a cmake_args=(
         -B "$build_dir" -S "$source_dir" -G Ninja
         "-DCMAKE_BUILD_TYPE=${build_type}"
@@ -88,4 +92,12 @@ build_aseprite() {
     ninja "${ninja_args[@]}"
 
     [[ -f "$build_dir/bin/aseprite" ]] || die "build finished but $build_dir/bin/aseprite was not produced"
+}
+
+try_upstream_auto_build() {
+    local source_dir="$1" skia_dir="$2" jobs="$3"
+    (
+        cd "$source_dir" || exit 1
+        ./build.sh --auto --norun
+    )
 }
