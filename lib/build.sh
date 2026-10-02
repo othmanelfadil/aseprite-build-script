@@ -47,8 +47,11 @@ build_aseprite() {
 
     log_step "building (${build_type})"
 
-    if [[ -x "source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then 
-        return 0
+    if [[ "$OS_KIND" == "macos"]]; then 
+        if [[ -x "source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then 
+            return 0
+        fi
+        log_warn "build.sh --auto unavailable, falling to manual mode"
     fi
 
     local -a cmake_args=(
