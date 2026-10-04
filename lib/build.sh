@@ -99,8 +99,16 @@ build_aseprite() {
 
 try_upstream_auto_build() {
     local source_dir="$1" skia_dir="$2" jobs="$3"
+    local deps_dir="$HOME/deps"
+    local tag
+    tag=$(skia_read_tag "$source_dir")
+    mkdir -p "$deps_dir"
+    if [[ ! -e "$deps_dir/skia-$tag" ]]; then
+        ln -s "$skia_dir" "$deps_dir/skia-$tag" 2>/dev/null || return 1 
+    fi
     (
         cd "$source_dir" || exit 1
+        export NINJA_JOBS="$jobs"
         ./build.sh --auto --norun
     )
 }
