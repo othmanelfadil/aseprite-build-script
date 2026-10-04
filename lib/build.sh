@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ -n "{_ASEPRITE_INSTALLER_BUILD_SH:-}" ]]; then
+if [[ -n "${_ASEPRITE_INSTALLER_BUILD_SH:-}" ]]; then
     return 0
 fi 
 _ASEPRITE_INSTALLER_BUILD_SH=1
@@ -47,7 +47,7 @@ build_aseprite() {
 
     log_step "building (${build_type})"
 
-    if [[ "$OS_KIND" == "macos"]]; then 
+    if [[ "$OS_KIND" == "macos" ]]; then 
         if [[ -x "source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then 
             return 0
         fi
