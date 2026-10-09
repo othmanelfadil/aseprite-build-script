@@ -59,3 +59,7 @@ if [[ "$SKIP_DEPS" != "1" ]]; then
     install_dependencies
     check_clang_version
 fi
+
+resolved_ref=$(fetch_source "$SOURCE_DIR" "$REF")
+skia_dir=$(ensure_skia "$SOURCE_DIR")
+build_aseprite "$SOURCE_DIR" "$skia_dir" "$BUILD_TYPE" "$JOBS"
