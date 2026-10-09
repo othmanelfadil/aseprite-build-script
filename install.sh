@@ -69,8 +69,20 @@ fi
 if [[ "$REINSTALL" != "1" && -f "$MARKER_FILE" ]]; then
     installed_ref="$(cat "$MARKER_FILE")"
     if [[ -z "$REF" || "$REF" == "$installed_ref" ]]; then
-        log_ok "aseprite ${installed_ref} already installed (${BIN_DIR}/aseprite), use --reinstall to force a rebuild"
-        exit 0
+        if [[ -z "$REF" ]]; then
+            if [[ -d "$SOURCE_DIR/.git" ]]; then
+                git -C "$SOURCE_DIR" fetch --tags --quiet origin || true
+                latest=$(resolve_latest_tag "$SOURCE_DIR")
+                if [[ -n "$latest" && "$latest" != "$installed_ref" ]]; then
+                    log_info "${installed_ref} -> ${latest}"
+                    REF="$latest"
+                fi
+            fi
+        fi
+        if [[ -z "$REF" || "$REF" == "$installed_ref" ]]; then
+            log_ok "aseprite ${installed_ref} already installed (${BIN_DIR}/aseprite), use --reinstall to force a rebuild"
+            exit 0
+        fi
     fi
 fi
 
