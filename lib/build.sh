@@ -12,17 +12,18 @@ resolve_latest_tag() {
     git -C "$source_dir" tag -l 'v*' | grep -vE '(-beta|-rc|-alpha)' | sort -V | tail -n1
 }
 
+# only the ref goes to stdout, git output goes to stderr so ref=$(fetch_source) doesn't pick up submodule's status lines
 fetch_source() {
     local source_dir="$1"
     local ref="$2"
 
     if [[ -d "$source_dir/.git" ]]; then
         log_step "updating aseprite source"
-        run git -C "$source_dir" fetch --tags --prune origin
+        git -C "$source_dir" fetch --tags --prune --progress origin >&2
     else
         log_step "cloning aseprite"
         mkdir -p "$(dirname "$source_dir")"
-        run git clone "$ASEPRITE_REPO_URL" "$source_dir"
+        git clone --progress "$ASEPRITE_REPO_URL" "$source_dir" >&2
     fi
 
     if [[ -z "$ref" ]]; then
@@ -33,7 +34,7 @@ fetch_source() {
 
     run git -C "$source_dir" checkout --force "$ref"
     log_step "fetching submodules"
-    run git -C "$source_dir" submodule update --init --recursive
+    git -C "$source_dir" submodule update --init --recursive --progress >&2
 
     echo "$ref"
 }
