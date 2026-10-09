@@ -66,6 +66,14 @@ if [[ "$SKIP_DEPS" != "1" ]]; then
     check_clang_version
 fi
 
+if [[ "$REINSTALL" != "1" && -f "$MARKER_FILE" ]]; then
+    installed_ref="$(cat "$MARKER_FILE")"
+    if [[ -z "$REF" || "$REF" == "$installed_ref" ]]; then
+        log_ok "aseprite ${installed_ref} already installed (${BIN_DIR}/aseprite), use --reinstall to force a rebuild"
+        exit 0
+    fi
+fi
+
 resolved_ref=$(fetch_source "$SOURCE_DIR" "$REF")
 skia_dir=$(ensure_skia "$SOURCE_DIR")
 build_aseprite "$SOURCE_DIR" "$skia_dir" "$BUILD_TYPE" "$JOBS"
