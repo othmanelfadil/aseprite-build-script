@@ -55,6 +55,12 @@ MARKER_FILE="$PREFIX/installed-ref"
 
 detect_os
 
+avail_gb=$(free_space_gb "$HOME")
+if [[ -n "$avail_gb" && "$avail_gb" -lt 8 ]]; then
+    log_warn "only ~${avail_gb}GB free under \$HOME, the build typically needs 5-10GB"
+    confirm "continue anyway?" || die "aborted"
+fi
+
 if [[ "$SKIP_DEPS" != "1" ]]; then
     install_dependencies
     check_clang_version
