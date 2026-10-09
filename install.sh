@@ -25,6 +25,7 @@ Usage: ./install.sh [options]
   -v, --ref <tag>       Git tag/branch to build
   -j, --jobs <N>         Parallel build jobs
       --prefix <dir>       Install location
+      --skip-deps            Skip OS package dependency installation
       --reinstall              Force rebuild
       --debug                    Debug build
       --uninstall                    Remove the install and exit
@@ -47,3 +48,14 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 export ASSUME_YES
+
+SOURCE_DIR="$PREFIX/src"
+VERSIONS_DIR="$PREFIX/versions"
+MARKER_FILE="$PREFIX/installed-ref"
+
+detect_os
+
+if [[ "$SKIP_DEPS" != "1" ]]; then
+    install_dependencies
+    check_clang_version
+fi
