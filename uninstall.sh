@@ -11,6 +11,7 @@ ASSUME_YES=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        --purge) PURGE=1; shift ;;
         -y|--yes) ASSUME_YES=1; shift ;;
         *) die "unknown option: $1" ;;
     esac
@@ -35,5 +36,10 @@ if [[ -d "$PREFIX/versions" ]]; then
     rm -rf "$PREFIX/versions"
 fi
 rm -f "$PREFIX/installed-ref"
+
+if [[ "$PURGE" == "1" ]]; then
+    rm -rf "$PREFIX/src"
+    rm -rf "${SKIA_CACHE_DIR:-$HOME/.cache/aseprite-installer/skia}"
+fi
 
 log_ok "uninstalled"
