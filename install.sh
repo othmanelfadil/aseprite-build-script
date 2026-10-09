@@ -63,3 +63,18 @@ fi
 resolved_ref=$(fetch_source "$SOURCE_DIR" "$REF")
 skia_dir=$(ensure_skia "$SOURCE_DIR")
 build_aseprite "$SOURCE_DIR" "$skia_dir" "$BUILD_TYPE" "$JOBS"
+
+log_step "installing"
+version_dir="$VERSION_DIR/$resolved_ref"
+build_bin_dir="$SOURCE_DIR/build/bin"
+[[ -f "$build_bin_dir/aseprite" ]] || die "expected build output at $build_bin_dir/aseprite, but it's missing"
+
+rm -rf "$version_dir"
+mkdir -p "$version_dir"
+cp -a "$build_bin_dir/." "$version_dir/"
+
+mkdir -p "$BIN_DIR"
+ln -sf "$version_dir/aseprite" "$BIN_DIR/aseprite"
+echo "$resolved_ref" > "$MARKER_FILE"
+
+log_ok "aseprite ${resolved_ref} installed -> ${BIND_DIR}/aseprite"
