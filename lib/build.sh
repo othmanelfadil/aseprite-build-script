@@ -32,7 +32,7 @@ fetch_source() {
     log_info "ref: ${ref}"
 
     run git -C "$source_dir" checkout --force "$ref"
-    log_step "fecthing submodules"
+    log_step "fetching submodules"
     run git -C "$source_dir" submodule update --init --recursive
 
     echo "$ref"
@@ -48,7 +48,7 @@ build_aseprite() {
     log_step "building (${build_type})"
 
     if [[ "$OS_KIND" == "macos" ]]; then 
-        if [[ -x "source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then 
+        if [[ -x "$source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then 
             return 0
         fi
         log_warn "build.sh --auto unavailable, falling back to manual mode"
