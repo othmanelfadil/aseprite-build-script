@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/common.sh"
+
 PREFIX="${PREFIX:-$HOME/.local/share/aseprite-installer}"
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
 ASSUME_YES=0
