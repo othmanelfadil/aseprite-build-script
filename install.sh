@@ -77,4 +77,24 @@ mkdir -p "$BIN_DIR"
 ln -sf "$version_dir/aseprite" "$BIN_DIR/aseprite"
 echo "$resolved_ref" > "$MARKER_FILE"
 
+if [[ "$OS_KIND" == "linux" ]]; then
+    desktop_dir="$HOME/.local/share/applications"
+    icon_dir="$HOME/.local/share/icons/hicolor/256x256/apps"
+    mkdir -p "$desktop_dir" "$icon_dir"
+    icon_src="$SOURCE_DIR/data/icons/ase256.png"
+    if [[ -f "$icon_src" ]]; then
+        cp -f "$icon_src" "$icon_dir/aseprite.png"
+    fi
+    cat > "$desktop_dir/aseprite.desktop" <<EOF
+[Desktop Entry]
+Type=Application
+Name=Aseprite
+Comment=Animated sprite editor & pixel art tool
+Exec=$BIN_DIR/aseprite %f
+Icon=aseprite
+Terminal=false
+Categories=Graphics;2DGraphics;RasterGraphics;
+EOF
+fi
+
 log_ok "aseprite ${resolved_ref} installed -> ${BIND_DIR}/aseprite"
