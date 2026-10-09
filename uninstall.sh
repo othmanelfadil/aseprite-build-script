@@ -8,6 +8,7 @@ source "$SCRIPT_DIR/lib/common.sh"
 PREFIX="${PREFIX:-$HOME/.local/share/aseprite-installer}"
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
 ASSUME_YES=0
+PURGE=0
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
