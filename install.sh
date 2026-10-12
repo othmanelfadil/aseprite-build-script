@@ -121,6 +121,10 @@ Icon=aseprite
 Terminal=false
 Categories=Graphics;2DGraphics;RasterGraphics;
 EOF
+
+    has_cmd update-desktop-database && update-desktop-database "$desktop_dir" >/dev/null 2>&1
+    has_cmd gtk-update-icon-cache && gtk-update-icon-cache -q "$HOME/.local/share/icons/hicolor" >/dev/null 2>&1
+    true
 fi
 
 log_ok "aseprite ${resolved_ref} installed -> ${BIND_DIR}/aseprite"
