@@ -122,9 +122,12 @@ Terminal=false
 Categories=Graphics;2DGraphics;RasterGraphics;
 EOF
 
-    has_cmd update-desktop-database && update-desktop-database "$desktop_dir" >/dev/null 2>&1
-    has_cmd gtk-update-icon-cache && gtk-update-icon-cache -q "$HOME/.local/share/icons/hicolor" >/dev/null 2>&1
-    true
+    if has_cmd update-desktop-database; then
+        update-desktop-database "$desktop_dir" >/dev/null 2>&1 || true
+    fi
+    if has_cmd gtk-update-icon-cache; then
+        gtk-update-icon-cache -q "$HOME/.local/share/icons/hicolor" >/dev/null 2>&1 || true
+    fi
 fi
 
 log_ok "aseprite ${resolved_ref} installed -> ${BIND_DIR}/aseprite"
