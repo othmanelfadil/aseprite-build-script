@@ -26,6 +26,19 @@ die() {
     exit 1
 }
 
+_on_err(){
+    local exit_code=$?
+    local line_no=$1
+    local src="${BASH_SOURCE[1]:-$0}"
+    log_error "failed at ${src}:${line_no} (exit code ${exit_code})"
+    log_error "see README.md troubleshooting"
+    exit "$exit_code"
+}
+
+install_error_trap(){
+    trap '_on_err $LINENO' ERR
+}
+
 confirm() {
     local prompt="$1"
     if [[ "${ASSUME_YES:-0}" == "1" ]]; then
