@@ -47,6 +47,7 @@ build_aseprite() {
     local build_dir="$source_dir/build"
 
     log_step "building (${build_type})"
+    has_cmd ccache && log_info "ccache found, rebuilds after this one will be faster"
 
     if [[ "$OS_KIND" == "macos" ]]; then 
         if [[ -x "$source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then 
@@ -93,7 +94,7 @@ build_aseprite() {
 
     local -a ninja_args=(-C "$build_dir" aseprite)
     [[ -n "$jobs" ]] && ninja_args=(-j "$jobs" "${ninja_args[@]}")
-    ninja "${ninja_args[@]}"
+    run_ninja_with_bar "${ninja_args[@]}"
 
     [[ -f "$build_dir/bin/aseprite" ]] || die "build finished but $build_dir/bin/aseprite was not produced"
 }
@@ -109,7 +110,8 @@ try_upstream_auto_build() {
     fi
     (
         cd "$source_dir" || exit 1
-        export NINJA_JOBS="$jobs"
-        ./build.sh --auto --norun
+        [[ -n "$jobs" ]] && export CMAKE_BUILD_PARALLEL_LEVEL="$jobs"
+        export NINJA_STATUS="[%p %f/%t] "
+        run_logged ./build.sh --auto --norun
     )
 }

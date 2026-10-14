@@ -77,3 +77,29 @@ free_space() {
     local path="$1"
     df -Pk "$path" 2>/dev/null | awk 'NR==2 {printf "%d", $4/1024/1024 }'
 }
+
+run_ninja_with_bar() {
+    if [[ ! -t 1 ]]; then
+        ninja "$@"
+        return $?
+    fi
+
+    local status=0
+    NINJA_STATUS=$'@@P %f %t\n' ninja "$@" 2>&1 | awk -v CR=$'\r' '
+        /^@@P / {
+            cur = $2 + 0; tot = $3 + 0;
+            pct = (tot > 0) ? int(cur * 100 / tot) : 0;
+            width = 32;
+            filled = (tot > 0) ? int(width * cur / tot) : 0;
+            bar = "";
+            for (i = 0; i < width; i++) bar = bar (i < filled ? "#" : "-");
+            printf "%s[%s] %3d%% (%d/%d)", CR, bar, pct, cur, tot;
+            fflush();
+            next;
+        }
+        { printf "%s%s\n", CR, $0; fflush(); }
+        END { printf "\n"; }
+    '
+    status="${PIPESTATUS[0]}"
+    return "$status"
+}
