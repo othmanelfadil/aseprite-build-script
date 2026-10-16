@@ -103,3 +103,29 @@ run_ninja_with_bar() {
     status="${PIPESTATUS[0]}"
     return "$status"
 }
+
+LOG_FILE=""
+init_log_file() {
+    LOG_FILE="$1"
+    mkdir -p "$(dirname "$LOG_FILE")"
+    : > "$LOG_FILE"
+}
+
+run_logged() {
+    if [[ "${VERBOSE:-0}" == "1" || -z "$LOG_FILE" ]]; then
+        run "$@"
+        return $?
+    fi
+    log_info "$*"
+    {
+        echo "+ $*"
+        "$@"
+    } >>"$LOG_FILE" 2>&1
+}
+
+tail_log() {
+    if [[ -n "$LOG_FILE" && -f "$LOG_FILE" ]]; then
+        log_error "last lines of $LOG_FILE:"
+        tail -n 25 "$LOG_FILE" >&2
+    fi
+}
