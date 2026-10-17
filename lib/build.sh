@@ -19,11 +19,11 @@ fetch_source() {
 
     if [[ -d "$source_dir/.git" ]]; then
         log_step "updating aseprite source"
-        git -C "$source_dir" fetch --tags --prune --progress origin >&2
+        run_logged git -C "$source_dir" fetch --tags --prune --progress origin >&2
     else
         log_step "cloning aseprite"
         mkdir -p "$(dirname "$source_dir")"
-        git clone --progress "$ASEPRITE_REPO_URL" "$source_dir" >&2
+        run_logged git clone --progress "$ASEPRITE_REPO_URL" "$source_dir" >&2
     fi
 
     if [[ -z "$ref" ]]; then
@@ -32,7 +32,7 @@ fetch_source() {
     fi
     log_info "ref: ${ref}"
 
-    run git -C "$source_dir" checkout --force "$ref"
+    run_logged run git -C "$source_dir" checkout --force "$ref"
     log_step "fetching submodules"
     git -C "$source_dir" submodule update --init --recursive --progress >&2
 

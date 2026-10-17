@@ -31,6 +31,7 @@ _on_err(){
     local line_no=$1
     local src="${BASH_SOURCE[1]:-$0}"
     log_error "failed at ${src}:${line_no} (exit code ${exit_code})"
+    tail_log
     log_error "see README.md troubleshooting"
     exit "$exit_code"
 }
