@@ -34,7 +34,7 @@ fetch_source() {
 
     run_logged run git -C "$source_dir" checkout --force "$ref"
     log_step "fetching submodules"
-    git -C "$source_dir" submodule update --init --recursive --progress >&2
+    run_logged git -C "$source_dir" submodule update --init --recursive --progress >&2
 
     echo "$ref"
 }
@@ -90,7 +90,8 @@ build_aseprite() {
             ;;
     esac
 
-    cmake "${cmake_args[@]}"
+    log_info "configuring..."
+    run_logged cmake "${cmake_args[@]}"
 
     local -a ninja_args=(-C "$build_dir" aseprite)
     [[ -n "$jobs" ]] && ninja_args=(-j "$jobs" "${ninja_args[@]}")
