@@ -113,15 +113,17 @@ init_log_file() {
 }
 
 run_logged() {
-    if [[ "${VERBOSE:-0}" == "1" || -z "$LOG_FILE" ]]; then
-        run "$@"
+    log_info "$*"
+    if [[ -z "$LOG_FILE" ]]; then
+        "$@" >/dev/null
         return $?
     fi
-    log_info "$*"
-    {
-        echo "+ $*"
-        "$@"
-    } >>"$LOG_FILE" 2>&1
+    echo "+ $*" >>"$LOG_FILE" 2>&1
+    if [[ "${VERBOSE:-0}" == "1" ]]; then
+        "$@" > >(tee -a "$LOG_FILE" >&2) 2>&1
+    else
+        "$@" >>"$LOG_FILE" 2>&1
+    fi
 }
 
 tail_log() {
