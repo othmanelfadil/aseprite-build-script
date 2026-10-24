@@ -80,7 +80,7 @@ free_space() {
 }
 
 run_ninja_with_bar() {
-    if [[ ! -t 1 ]]; then
+    if [[ "${VERBOSE:-0}" == "1" || ! -t 1 ]]; then
         ninja "$@"
         return $?
     fi

@@ -43,7 +43,7 @@ while [[ $# -gt 0 ]]; do
         --skip-deps) SKIP_DEPS=1; shift ;;
         --reinstall) REINSTALL=1; shift ;;
         --debug) BUILD_TYPE="Debug"; shift ;;
-        --verbose) VERBOSE=1; shift;;
+        --verbose) VERBOSE=1; shift ;;
         --uninstall) DO_UNINSTALL=1; shift ;;
         -h|--help) usage; exit 0 ;;
         *) die "unknown option: $1 (see --help)" ;;
@@ -110,7 +110,8 @@ echo "$resolved_ref" > "$MARKER_FILE"
 
 if [[ "$OS_KIND" == "linux" ]]; then
     desktop_dir="$HOME/.local/share/applications"
-    icon_dir="$HOME/.local/share/icons/hicolor/256x256/apps"
+    hicolor_dir="$HOME/.local/share/icons/hicolor"
+    icon_dir="$hicolor_dir/256x256/apps"
     mkdir -p "$desktop_dir" "$icon_dir"
     icon_src="$SOURCE_DIR/data/icons/ase256.png"
     if [[ -f "$icon_src" ]]; then
@@ -130,8 +131,21 @@ EOF
     if has_cmd update-desktop-database; then
         update-desktop-database "$desktop_dir" >/dev/null 2>&1 || true
     fi
+    if [[ ! -f "$hicolor_dir/index.theme" ]]; then
+        cat > "$hicolor_dir/index.theme" <<'EOF'
+[Icon Theme]
+Name=Hicolor
+Comment=Fallback icon theme
+Hidden=true
+Directories=256x256/apps
+[256x256/apps]
+Size=256
+Context=Applications
+Type=Fixed
+EOF
+    fi
     if has_cmd gtk-update-icon-cache; then
-        gtk-update-icon-cache -q "$HOME/.local/share/icons/hicolor" >/dev/null 2>&1 || true
+        gtk-update-icon-cache -q -f "$hicolor_dir" >/dev/null 2>&1 || true
     fi
 fi
 
