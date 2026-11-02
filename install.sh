@@ -129,41 +129,9 @@ Categories=Graphics;2DGraphics;RasterGraphics;
 EOF
 
     if has_cmd update-desktop-database; then
-        update-desktop-database "$desktop_dir" >/dev/null 2>&1 || true
+         update-desktop-database "$desktop_dir" >/dev/null 2>&1 || true
     fi
-    if [[ ! -f "$hicolor_dir/index.theme" ]]; then
-        existing_dirs=()
-        while IFS= read -r -d '' d; do
-            existing_dirs+=("$d")
-        done < <(find "$hicolor_dir" -mindepth 2 -maxdepth 2 -type d -printf '%P\0' 2>/dev/null | sort -z)
-        if [[ ${#existing_dirs[@]} -eq 0 ]]; then
-            existing_dirs=("256x256/apps")
-        fi
-        {
-            echo "[Icon Theme]"
-            echo "Name=Hicolor"
-            echo "Comment=Fallback icon theme"
-            echo "Hidden=true"
-            printf 'Directories=%s\n' "$(IFS=,; echo "${existing_dirs[*]}")"
-            for d in "${existing_dirs[@]}"; do
-                size="${d%%/*}"; size="${size%%x*}"
-                context="${d#*/}"
-                case "$context" in
-                    apps) context="Applications" ;;
-                    mimetypes) context="MimeTypes" ;;
-                    *) context="Applications" ;;
-                esac
-                echo ""
-                echo "[$d]"
-                echo "Size=${size}"
-                echo "Context=${context}"
-                echo "Type=Fixed"
-            done
-        } > "$hicolor_dir/index.theme"
-    fi
-    if has_cmd gtk-update-icon-cache; then
-        gtk-update-icon-cache -q -f "$hicolor_dir" >/dev/null 2>&1 || true
-    fi
+   
 fi
 
 log_ok "aseprite ${resolved_ref} installed -> ${BIND_DIR}/aseprite"
