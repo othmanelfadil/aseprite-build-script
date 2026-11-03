@@ -131,7 +131,7 @@ EOF
     if has_cmd update-desktop-database; then
          update-desktop-database "$desktop_dir" >/dev/null 2>&1 || true
     fi
-   
+
 fi
 
 log_ok "aseprite ${resolved_ref} installed -> ${BIND_DIR}/aseprite"

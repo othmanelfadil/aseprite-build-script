@@ -48,7 +48,7 @@ detect_os() {
     if [[ "$OS_KIND" == "macos" ]]; then
         PKG_MANAGER="brew"
     else
-    # to add more distros 
+    # to add more distros
     # id_like is checked at first since that's how os-release identifies a distro's base (not always likefor arch and opensuse)
         if [[ "$OS_ID_LIKE" == *fedora* || "$OS_ID_LIKE" == *rhel* || "$OS_ID" =~ ^(fedora|rhel|centos|rocky|almalinux)$ ]]; then
 +            PKG_MANAGER="dnf"

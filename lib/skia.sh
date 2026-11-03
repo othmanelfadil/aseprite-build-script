@@ -9,7 +9,7 @@ _ASEPRITE_INSTALLER_SKIA_SH=1
 SKIA_CACHE_DIR="${SKIA_CACHE_DIR:-$HOME/.cache/aseprite-installer/skia}"
 
 skia_platform_label() {
-    case "$OS_KIND" in 
+    case "$OS_KIND" in
         linux) echo "Linux" ;;
         macos) echo "macOS" ;;
         *) die "unsupported OS for skia prebuilt: $OS_KIND" ;;
@@ -26,7 +26,7 @@ skia_read_tag() {
 skia_url() {
     local tag="$1"
     local build="${2:-Release}"
-    local platform 
+    local platform
     platform=$(skia_platform_label)
     echo "https://github.com/aseprite/skia/releases/download/${tag}/Skia-${platform}-${build}-${ARCH}.zip"
 }

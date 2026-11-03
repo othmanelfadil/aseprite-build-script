@@ -74,7 +74,7 @@ install_dependencies() {
 check_clang_version() {
     [[ "$OS_KIND" == "linux" ]] || return 0
     has_cmd clang || return 0
-    local ver 
+    local ver
     ver=$(clang --version 2>/dev/null | head -n1 | grep -oE '[0-9]+' | head -n1 || echo 0)
     if [[ "${ver:-0}" -lt 12 ]]; then
         log_warn "clang ${ver} found, aseprite recommend version 12+ (gcc may still work)"

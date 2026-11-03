@@ -45,12 +45,12 @@ confirm() {
     if [[ "${ASSUME_YES:-0}" == "1" ]]; then
         return 0
     fi
-    local reply 
+    local reply
     read -r -p "$prompt [y/n] " reply </dev/ty || reply=""
     [[ "$reply" =~ ^[Yy]$ ]]
 }
 
-has_cmd() {command -v "$1" >/dev/null 2>&1;} 
+has_cmd() {command -v "$1" >/dev/null 2>&1;}
 
 run() {
     log_info "$*"
@@ -60,10 +60,10 @@ run() {
 run_sudo() {
     if  [[ "$(id -u)" == "0"]]; then\
         run "$@"
-    else 
+    else
         log_info "sudo $*"
         sudo "$@"
-    fi 
+    fi
 }
 
 version_ge() {

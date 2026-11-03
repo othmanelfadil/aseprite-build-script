@@ -2,7 +2,7 @@
 
 if [[ -n "${_ASEPRITE_INSTALLER_BUILD_SH:-}" ]]; then
     return 0
-fi 
+fi
 _ASEPRITE_INSTALLER_BUILD_SH=1
 
 ASEPRITE_REPO_URL="${ASEPRITE_REPO_URL:-https://github.com/aseprite/aseprite.git}"
@@ -19,11 +19,11 @@ fetch_source() {
 
     if [[ -d "$source_dir/.git" ]]; then
         log_step "updating aseprite source"
-        run_logged git -C "$source_dir" fetch --tags --prune --progress origin 
+        run_logged git -C "$source_dir" fetch --tags --prune --progress origin
     else
         log_step "cloning aseprite"
         mkdir -p "$(dirname "$source_dir")"
-        run_logged git clone --progress "$ASEPRITE_REPO_URL" "$source_dir" 
+        run_logged git clone --progress "$ASEPRITE_REPO_URL" "$source_dir"
     fi
 
     if [[ -z "$ref" ]]; then
@@ -34,7 +34,7 @@ fetch_source() {
 
     run_logged run git -C "$source_dir" checkout --force "$ref"
     log_step "fetching submodules"
-    run_logged git -C "$source_dir" submodule update --init --recursive --progress 
+    run_logged git -C "$source_dir" submodule update --init --recursive --progress
 
     echo "$ref"
 }
@@ -49,8 +49,8 @@ build_aseprite() {
     log_step "building (${build_type})"
     has_cmd ccache && log_info "ccache found, rebuilds after this one will be faster"
 
-    if [[ "$OS_KIND" == "macos" ]]; then 
-        if [[ -x "$source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then 
+    if [[ "$OS_KIND" == "macos" ]]; then
+        if [[ -x "$source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then
             return 0
         fi
         log_warn "build.sh --auto unavailable, falling back to manual mode"
@@ -107,7 +107,7 @@ try_upstream_auto_build() {
     tag=$(skia_read_tag "$source_dir")
     mkdir -p "$deps_dir"
     if [[ ! -e "$deps_dir/skia-$tag" ]]; then
-        ln -s "$skia_dir" "$deps_dir/skia-$tag" 2>/dev/null || return 1 
+        ln -s "$skia_dir" "$deps_dir/skia-$tag" 2>/dev/null || return 1
     fi
     (
         cd "$source_dir" || exit 1
