@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ -n "${_ASEPRITE_INSTALLER_COMMON_SH}" ]]; then
+if [[ -n "${_ASEPRITE_INSTALLER_COMMON_SH:-}" ]]; then
     return 0
 fi
 _ASEPRITE_INSTALLER_COMMON_SH=1
