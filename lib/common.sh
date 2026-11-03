@@ -8,9 +8,9 @@ _ASEPRITE_INSTALLER_COMMON_SH=1
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
     C_RED=$'\033[0;31m'
     C_GREEN=$'\033[0;32m'
-    C_YELLOW=$']033[0;33m'
-    C_BOLD=$'033[1m'
-    C_RESET=$'033[0m'
+    C_YELLOW=$'\033[0;33m'
+    C_BOLD=$'\033[1m'
+    C_RESET=$'\033[0m'
 else
     C_RED=""; C_GREEN=""; C_YELLOW=""; C_BOLD=""; C_RESET=""
 fi
@@ -46,7 +46,7 @@ confirm() {
         return 0
     fi
     local reply
-    read -r -p "$prompt [y/n] " reply </dev/ty || reply=""
+    read -r -p "$prompt [y/N] " reply </dev/tty || reply=""
     [[ "$reply" =~ ^[Yy]$ ]]
 }
 
@@ -74,7 +74,7 @@ version_ge() {
     [[  "$highest" == "$a" ]]
 }
 
-free_space() {
+free_space_gb() {
     local path="$1"
     df -Pk "$path" 2>/dev/null | awk 'NR==2 {printf "%d", $4/1024/1024 }'
 }

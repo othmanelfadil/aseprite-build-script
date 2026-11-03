@@ -42,7 +42,7 @@ ensure_skia() {
     tag=$(skia_read_tag "$source_dir")
     dest_dir=$(skia_dir_for_tag "$tag")
 
-    if [[ -d "$dest_dir" && -n "$(ls - A "$dest_dir" 2>/dev/null)" ]]; then
+    if [[ -d "$dest_dir" && -n "$(ls -A "$dest_dir" 2>/dev/null)" ]]; then
         echo "$dest_dir"
         return 0
     fi

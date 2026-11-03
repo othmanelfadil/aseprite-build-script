@@ -96,7 +96,7 @@ skia_dir=$(ensure_skia "$SOURCE_DIR")
 build_aseprite "$SOURCE_DIR" "$skia_dir" "$BUILD_TYPE" "$JOBS"
 
 log_step "installing"
-version_dir="$VERSION_DIR/$resolved_ref"
+version_dir="$VERSIONS_DIR/$resolved_ref"
 build_bin_dir="$SOURCE_DIR/build/bin"
 [[ -f "$build_bin_dir/aseprite" ]] || die "expected build output at $build_bin_dir/aseprite, but it's missing"
 
@@ -134,4 +134,4 @@ EOF
 
 fi
 
-log_ok "aseprite ${resolved_ref} installed -> ${BIND_DIR}/aseprite"
+log_ok "aseprite ${resolved_ref} installed -> ${BIN_DIR}/aseprite"

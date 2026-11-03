@@ -32,7 +32,7 @@ fetch_source() {
     fi
     log_info "ref: ${ref}"
 
-    run_logged run git -C "$source_dir" checkout --force "$ref"
+    run_logged git -C "$source_dir" checkout --force "$ref"
     log_step "fetching submodules"
     run_logged git -C "$source_dir" submodule update --init --recursive --progress
 
