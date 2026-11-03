@@ -50,7 +50,7 @@ confirm() {
     [[ "$reply" =~ ^[Yy]$ ]]
 }
 
-has_cmd() {command -v "$1" >/dev/null 2>&1;}
+has_cmd() { command -v "$1" >/dev/null 2>&1; }
 
 run() {
     log_info "$*"
@@ -58,7 +58,7 @@ run() {
 }
 
 run_sudo() {
-    if  [[ "$(id -u)" == "0"]]; then\
+    if [[ "$(id -u)" == "0" ]]; then
         run "$@"
     else
         log_info "sudo $*"

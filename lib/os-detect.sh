@@ -51,18 +51,18 @@ detect_os() {
     # to add more distros
     # id_like is checked at first since that's how os-release identifies a distro's base (not always likefor arch and opensuse)
         if [[ "$OS_ID_LIKE" == *fedora* || "$OS_ID_LIKE" == *rhel* || "$OS_ID" =~ ^(fedora|rhel|centos|rocky|almalinux)$ ]]; then
-+            PKG_MANAGER="dnf"
-+        elif [[ "$OS_ID_LIKE" == *debian* || "$OS_ID_LIKE" == *ubuntu* || "$OS_ID" =~ ^(ubuntu|debian)$ ]]; then
-+            PKG_MANAGER="apt"
-+        elif [[ "$OS_ID_LIKE" == *arch* || "$OS_ID" == "arch" ]]; then
-+            PKG_MANAGER="pacman"
-+        elif [[ "$OS_ID_LIKE" == *suse* || "$OS_ID" == opensuse* || "$OS_ID" == "sles" ]]; then
-+            PKG_MANAGER="zypper"
-+        elif has_cmd dnf; then PKG_MANAGER="dnf"
-+        elif has_cmd apt-get; then PKG_MANAGER="apt"
-+        elif has_cmd pacman; then PKG_MANAGER="pacman"
-+        elif has_cmd zypper; then PKG_MANAGER="zypper"
-+        fi
+            PKG_MANAGER="dnf"
+        elif [[ "$OS_ID_LIKE" == *debian* || "$OS_ID_LIKE" == *ubuntu* || "$OS_ID" =~ ^(ubuntu|debian)$ ]]; then
+            PKG_MANAGER="apt"
+        elif [[ "$OS_ID_LIKE" == *arch* || "$OS_ID" == "arch" ]]; then
+            PKG_MANAGER="pacman"
+        elif [[ "$OS_ID_LIKE" == *suse* || "$OS_ID" == opensuse* || "$OS_ID" == "sles" ]]; then
+            PKG_MANAGER="zypper"
+        elif has_cmd dnf; then PKG_MANAGER="dnf"
+        elif has_cmd apt-get; then PKG_MANAGER="apt"
+        elif has_cmd pacman; then PKG_MANAGER="pacman"
+        elif has_cmd zypper; then PKG_MANAGER="zypper"
+        fi
     fi
 
     export OS_KIND OS_ID ARCH PKG_MANAGER
