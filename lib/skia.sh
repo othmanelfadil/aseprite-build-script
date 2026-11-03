@@ -7,6 +7,7 @@ fi
 _ASEPRITE_INSTALLER_SKIA_SH=1
 
 SKIA_CACHE_DIR="${SKIA_CACHE_DIR:-$HOME/.cache/aseprite-installer/skia}"
+SKIA_DIR=""
 
 skia_platform_label() {
     case "$OS_KIND" in
@@ -41,9 +42,9 @@ ensure_skia() {
     local tag url zip_path dest_dir
     tag=$(skia_read_tag "$source_dir")
     dest_dir=$(skia_dir_for_tag "$tag")
+    SKIA_DIR="$dest_dir"
 
     if [[ -d "$dest_dir" && -n "$(ls -A "$dest_dir" 2>/dev/null)" ]]; then
-        echo "$dest_dir"
         return 0
     fi
 
@@ -69,6 +70,4 @@ ensure_skia() {
     mkdir -p "$dest_dir"
     unzip -q "$zip_path" -d "$dest_dir"
     rm -f "$zip_path"
-
-    echo "$dest_dir"
 }

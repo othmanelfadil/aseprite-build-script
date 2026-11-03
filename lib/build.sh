@@ -9,8 +9,10 @@ ASEPRITE_REPO_URL="${ASEPRITE_REPO_URL:-https://github.com/aseprite/aseprite.git
 
 resolve_latest_tag() {
     local source_dir="$1"
-    git -C "$source_dir" tag -l 'v*' | grep -vE '(-beta|-rc|-alpha)' | sort -V | tail -n1
+    git -C "$source_dir" tag -l 'v*' | { grep -vE '(-beta|-rc|-alpha)' || true; } | sort -V | tail -n1
 }
+
+RESOLVED_REF=""
 
 # only the ref goes to stdout, git output goes to stderr so ref=$(fetch_source) doesn't pick up submodule's status lines
 fetch_source() {
@@ -36,7 +38,7 @@ fetch_source() {
     log_step "fetching submodules"
     run_logged git -C "$source_dir" submodule update --init --recursive --progress
 
-    echo "$ref"
+    RESOLVED_REF="$ref"
 }
 
 build_aseprite() {
@@ -47,6 +49,8 @@ build_aseprite() {
     local build_dir="$source_dir/build"
 
     log_step "building (${build_type})"
+    # without this a failed build leaves the previous binary here and passes the check below
+    rm -f "$build_dir/bin/aseprite"
     has_cmd ccache && log_info "ccache found, rebuilds after this one will be faster"
 
     if [[ "$OS_KIND" == "macos" ]]; then

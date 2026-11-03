@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 
+set -Eeuo pipefail
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/common.sh"
 source "$SCRIPT_DIR/lib/os-detect.sh"
 source "$SCRIPT_DIR/lib/deps.sh"
 source "$SCRIPT_DIR/lib/skia.sh"
 source "$SCRIPT_DIR/lib/build.sh"
+
+install_error_trap
 
 PREFIX="${PREFIX:-$HOME/.local/share/aseprite-installer}"
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
@@ -91,12 +95,12 @@ if [[ "$REINSTALL" != "1" && -f "$MARKER_FILE" ]]; then
     fi
 fi
 
-resolved_ref=$(fetch_source "$SOURCE_DIR" "$REF")
-skia_dir=$(ensure_skia "$SOURCE_DIR")
-build_aseprite "$SOURCE_DIR" "$skia_dir" "$BUILD_TYPE" "$JOBS"
+fetch_source "$SOURCE_DIR" "$REF"
+ensure_skia "$SOURCE_DIR"
+build_aseprite "$SOURCE_DIR" "$SKIA_DIR" "$BUILD_TYPE" "$JOBS"
 
 log_step "installing"
-version_dir="$VERSIONS_DIR/$resolved_ref"
+version_dir="$VERSIONS_DIR/$RESOLVED_REF"
 build_bin_dir="$SOURCE_DIR/build/bin"
 [[ -f "$build_bin_dir/aseprite" ]] || die "expected build output at $build_bin_dir/aseprite, but it's missing"
 
@@ -106,7 +110,7 @@ cp -a "$build_bin_dir/." "$version_dir/"
 
 mkdir -p "$BIN_DIR"
 ln -sf "$version_dir/aseprite" "$BIN_DIR/aseprite"
-echo "$resolved_ref" > "$MARKER_FILE"
+echo "$RESOLVED_REF" > "$MARKER_FILE"
 
 if [[ "$OS_KIND" == "linux" ]]; then
     desktop_dir="$HOME/.local/share/applications"
@@ -134,4 +138,4 @@ EOF
 
 fi
 
-log_ok "aseprite ${resolved_ref} installed -> ${BIN_DIR}/aseprite"
+log_ok "aseprite ${RESOLVED_REF} installed -> ${BIN_DIR}/aseprite"
