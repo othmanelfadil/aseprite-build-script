@@ -20,6 +20,7 @@ SKIP_DEPS=0
 REINSTALL=0
 ASSUME_YES=0
 DO_UNINSTALL=0
+PURGE=0
 VERBOSE=0
 
 usage() {
@@ -34,6 +35,7 @@ Usage: ./install.sh [options]
       --reinstall              Force rebuild
       --debug                    Debug build
       --uninstall                    Remove the install and exit
+      --purge                          With --uninstall, also remove the source and skia cache
   -h, --help                          Show this help
 EOF
 }
@@ -49,11 +51,19 @@ while [[ $# -gt 0 ]]; do
         --debug) BUILD_TYPE="Debug"; shift ;;
         --verbose) VERBOSE=1; shift ;;
         --uninstall) DO_UNINSTALL=1; shift ;;
-        -h|--help) usage; exit 0 ;;
+        --purge) PURGE=1; shift ;;
+        -h|--help) echo "Usage: ./uninstall.sh [--purge] [--prefix <dir>] [-y]"; exit 0 ;;
         *) die "unknown option: $1 (see --help)" ;;
     esac
 done
 export ASSUME_YES VERBOSE
+
+if [[ "$DO_UNINSTALL" == "1" ]]; then
+    uninstall_args=(--prefix "$PREFIX")
+    [[ "$ASSUME_YES" == "1" ]] && uninstall_args+=(--yes)
+    [[ "$PURGE" == "1" ]] && uninstall_args+=(--purge)
+    exec "$SCRIPT_DIR/uninstall.sh" "${uninstall_args[@]}"
+fi
 
 SOURCE_DIR="$PREFIX/src"
 VERSIONS_DIR="$PREFIX/versions"

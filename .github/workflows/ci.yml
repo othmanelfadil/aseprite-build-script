@@ -1,0 +1,26 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check syntax
+        run: for f in install.sh uninstall.sh get.sh lib/*.sh tests/*.sh; do bash -n "$f"; done
+      - name: Run shellcheck
+        run: shellcheck -x -P SCRIPTDIR -S warning install.sh uninstall.sh get.sh lib/*.sh tests/*.sh
+
+  check:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: run test
+        run: bash tests/check.sh
