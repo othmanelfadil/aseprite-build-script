@@ -14,6 +14,7 @@ resolve_latest_tag() {
 
 RESOLVED_REF=""
 
+# fetch only moves origin/<branch>, so a bare branch name would check out the old local one
 checkout_target() {
     local source_dir="$1" ref="$2"
     if git -C "$source_dir" show-ref --verify --quiet "refs/remotes/origin/$ref"; then
@@ -23,7 +24,7 @@ checkout_target() {
     fi
 }
 
-# only the ref goes to stdout, git output goes to stderr so ref=$(fetch_source) doesn't pick up submodule's status lines
+# sets RESOLVED_REF instead of echoing it, because set -e and die don't work inside $(...)
 fetch_source() {
     local source_dir="$1"
     local ref="$2"
@@ -48,6 +49,7 @@ fetch_source() {
     run_logged git -C "$source_dir" submodule sync --recursive
     run_logged git -C "$source_dir" submodule update --init --force --recursive --progress
 
+    # shellcheck disable=SC2034  # read by install.sh
     RESOLVED_REF="$ref"
 }
 

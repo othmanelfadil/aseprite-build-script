@@ -13,7 +13,9 @@ PURGE=0
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --purge) PURGE=1; shift ;;
+        --prefix) PREFIX="${2:?--prefix requires a value}"; shift 2 ;;
         -y|--yes) ASSUME_YES=1; shift ;;
+        -h|--help) echo "Usage: ./uninstall.sh [--purge] [--prefix <dir>] [-y]"; exit 0 ;;
         *) die "unknown option: $1" ;;
     esac
 done

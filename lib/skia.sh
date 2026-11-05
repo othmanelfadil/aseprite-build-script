@@ -37,11 +37,13 @@ skia_dir_for_tag() {
     echo "${SKIA_CACHE_DIR}/${tag}-${OS_KIND}-${ARCH}"
 }
 
+# sets SKIA_DIR instead of echoing it, same reason as fetch_source
 ensure_skia() {
     local source_dir="$1"
     local tag url zip_path dest_dir
     tag=$(skia_read_tag "$source_dir")
     dest_dir=$(skia_dir_for_tag "$tag")
+    # shellcheck disable=SC2034  # read by install.sh
     SKIA_DIR="$dest_dir"
 
     if [[ -d "$dest_dir" && -n "$(ls -A "$dest_dir" 2>/dev/null)" ]]; then

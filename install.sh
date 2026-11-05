@@ -52,7 +52,7 @@ while [[ $# -gt 0 ]]; do
         --verbose) VERBOSE=1; shift ;;
         --uninstall) DO_UNINSTALL=1; shift ;;
         --purge) PURGE=1; shift ;;
-        -h|--help) echo "Usage: ./uninstall.sh [--purge] [--prefix <dir>] [-y]"; exit 0 ;;
+        -h|--help) usage; exit 0 ;;
         *) die "unknown option: $1 (see --help)" ;;
     esac
 done
