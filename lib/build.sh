@@ -14,6 +14,15 @@ resolve_latest_tag() {
 
 RESOLVED_REF=""
 
+checkout_target() {
+    local source_dir="$1" ref="$2"
+    if git -C "$source_dir" show-ref --verify --quiet "refs/remotes/origin/$ref"; then
+        echo "origin/$ref"
+    else
+        echo "$ref"
+    fi
+}
+
 # only the ref goes to stdout, git output goes to stderr so ref=$(fetch_source) doesn't pick up submodule's status lines
 fetch_source() {
     local source_dir="$1"
@@ -34,9 +43,10 @@ fetch_source() {
     fi
     log_info "ref: ${ref}"
 
-    run_logged git -C "$source_dir" checkout --force "$ref"
+    run_logged git -C "$source_dir" checkout --force --detach "$(checkout_target "$source_dir" "$ref")"
     log_step "fetching submodules"
-    run_logged git -C "$source_dir" submodule update --init --recursive --progress
+    run_logged git -C "$source_dir" submodule sync --recursive
+    run_logged git -C "$source_dir" submodule update --init --force --recursive --progress
 
     RESOLVED_REF="$ref"
 }
