@@ -81,11 +81,13 @@ build_aseprite() {
     rm -f "$build_dir/bin/aseprite"
     has_cmd ccache && log_info "ccache found, rebuilds after this one will be faster"
 
-    if [[ "$OS_KIND" == "macos" ]]; then
-        if [[ -x "$source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs"; then
+    # build.sh --auto always builds release, so debug builds go through cmake directly
+    if [[ "$OS_KIND" == "macos" && "$build_type" != "Debug" ]]; then
+        # build.sh exits 0 even when the build fails, so check for the binary as well
+        if [[ -x "$source_dir/build.sh" ]] && try_upstream_auto_build "$source_dir" "$skia_dir" "$jobs" && [[ -f "$build_dir/bin/aseprite" ]]; then
             return 0
         fi
-        log_warn "build.sh --auto unavailable, falling back to manual mode"
+        log_warn "build.sh --auto didn't finish, falling back to cmake and ninja"
     fi
 
     local -a cmake_args=(
@@ -107,7 +109,10 @@ build_aseprite() {
             export CXX="${CXX:-clang++}"
             ;;
         macos)
-            cmake_args+=("-DCMAKE_OSX_ARCHITECTURES=${ARCH/x64/x86_64}")
+            cmake_args+=(
+                "-DCMAKE_OSX_ARCHITECTURES=${ARCH/x64/x86_64}"
+                "-DCMAKE_OSX_SYSROOT=$(xcrun --show-sdk-path)"
+            )
             if [[ "$ARCH" == "arm64" ]]; then
                 cmake_args+=(-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DPNG_ARM_NEON:STRING=on)
             else
@@ -129,11 +134,13 @@ build_aseprite() {
 try_upstream_auto_build() {
     local source_dir="$1" skia_dir="$2" jobs="$3"
     local deps_dir="$HOME/deps"
-    local tag
+    local tag link
     tag=$(skia_read_tag "$source_dir")
+    # upstream looks for skia-m124, not skia-m124-08a5439a6b
+    link="$deps_dir/skia-${tag%%-*}"
     mkdir -p "$deps_dir"
-    if [[ ! -e "$deps_dir/skia-$tag" ]]; then
-        ln -s "$skia_dir" "$deps_dir/skia-$tag" 2>/dev/null || return 1
+    if [[ ! -e "$link" ]]; then
+        ln -s "$skia_dir" "$link" 2>/dev/null || return 1
     fi
     (
         cd "$source_dir" || exit 1
