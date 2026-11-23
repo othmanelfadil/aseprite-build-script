@@ -80,13 +80,14 @@ free_space_gb() {
 }
 
 run_ninja_with_bar() {
+    local log="${LOG_FILE:-/dev/null}"
+
     if [[ "${VERBOSE:-0}" == "1" || ! -t 1 ]]; then
-        ninja "$@"
-        return $?
+        ninja "$@" 2>&1 | tee -a "$log"
+        return "${PIPESTATUS[0]}"
     fi
 
-    local status=0
-    NINJA_STATUS=$'@@P %f %t\n' ninja "$@" 2>&1 | awk -v CR=$'\r' '
+    NINJA_STATUS='@@P %f %t ' ninja "$@" 2>&1 | tee -a "$log" | awk -v CR=$'\r' '
         /^@@P / {
             cur = $2 + 0; tot = $3 + 0;
             pct = (tot > 0) ? int(cur * 100 / tot) : 0;
@@ -98,11 +99,10 @@ run_ninja_with_bar() {
             fflush();
             next;
         }
-        { printf "%s%s\n", CR, $0; fflush(); }
+        { printf "%s\033[K%s\n", CR, $0; fflush(); }
         END { printf "\n"; }
     '
-    status="${PIPESTATUS[0]}"
-    return "$status"
+    return "${PIPESTATUS[0]}"
 }
 
 LOG_FILE=""
