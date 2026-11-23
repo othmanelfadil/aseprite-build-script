@@ -32,11 +32,7 @@ detect_os() {
             ;;
     esac
     local m
-    if has_cmd arch; then
-        m="$(arch)"
-    else
-        m="$(uname -m)"
-    fi
+    m="$(uname -m)"
     case "$m" in
         x86_64|amd64) ARCH="x64" ;;
         arm64|aarch64) ARCH="arm64" ;;

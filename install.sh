@@ -70,6 +70,7 @@ VERSIONS_DIR="$PREFIX/versions"
 MARKER_FILE="$PREFIX/installed-ref"
 
 detect_os
+check_skia_platform
 
 init_log_file "$PREFIX/install.log"
 log_info "full build output goes to $PREFIX/install.log (use --verbose to see it live)"

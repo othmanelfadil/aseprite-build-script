@@ -9,6 +9,14 @@ _ASEPRITE_INSTALLER_SKIA_SH=1
 SKIA_CACHE_DIR="${SKIA_CACHE_DIR:-$HOME/.cache/aseprite-installer/skia}"
 SKIA_DIR=""
 
+# upstream only publishes these prebuilts, see github.com/aseprite/skia/releases
+check_skia_platform() {
+    case "${OS_KIND}-${ARCH}" in
+        linux-x64|linux-x86|macos-x64|macos-arm64) ;;
+        *) die "no prebuilt skia for ${OS_KIND}/${ARCH}, you'd have to build skia yourself (see aseprite's INSTALL.md)" ;;
+    esac
+}
+
 skia_platform_label() {
     case "$OS_KIND" in
         linux) echo "Linux" ;;

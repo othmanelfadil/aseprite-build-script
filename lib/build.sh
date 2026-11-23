@@ -74,6 +74,7 @@ build_aseprite() {
     local build_type="${3:-RelWithDebInfo}"
     local jobs="${4:-}"
     local build_dir="$source_dir/build"
+    local skia_lib_dir="${skia_dir}/out/Release-${ARCH}"
 
     log_step "building (${build_type})"
     # without this a failed build leaves the previous binary here and passes the check below
@@ -92,13 +93,13 @@ build_aseprite() {
         "-DCMAKE_BUILD_TYPE=${build_type}"
         -DLAF_BACKEND=skia
         "-DSKIA_DIR=${skia_dir}"
+        "-DSKIA_LIBRARY_DIR=${skia_lib_dir}"
+        "-DSKIA_LIBRARY=${skia_lib_dir}/libskia.a"
     )
 
     case "$OS_KIND" in
         linux)
             cmake_args+=(
-                "-DSKIA_LIBRARY_DIR=${skia_dir}/out/Release-x64"
-                "-DSKIA_LIBRARY=${skia_dir}/out/Release-x64/libskia.a"
                 -DCMAKE_CXX_FLAGS:STRING=-stdlib=libstdc++
                 -DCMAKE_EXE_LINKER_FLAGS:STRING=-stdlib=libstdc++
             )
@@ -106,13 +107,7 @@ build_aseprite() {
             export CXX="${CXX:-clang++}"
             ;;
         macos)
-            local lib_subdir="Release-x64"
-            [[ "$ARCH" == "arm64" ]] && lib_subdir="Release-arm64"
-            cmake_args+=(
-                "-DCMAKE_OSX_ARCHITECTURES=${ARCH/x64/x86_64}"
-                "-DSKIA_LIBRARY_DIR=${skia_dir}/out/${lib_subdir}"
-                "-DSKIA_LIBRARY=${skia_dir}/out/${lib_subdir}/libskia.a"
-            )
+            cmake_args+=("-DCMAKE_OSX_ARCHITECTURES=${ARCH/x64/x86_64}")
             if [[ "$ARCH" == "arm64" ]]; then
                 cmake_args+=(-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0 -DPNG_ARM_NEON:STRING=on)
             else
