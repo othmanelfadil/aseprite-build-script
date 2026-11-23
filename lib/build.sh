@@ -13,6 +13,7 @@ resolve_latest_tag() {
 }
 
 RESOLVED_REF=""
+RESOLVED_COMMIT=""
 
 # fetch only moves origin/<branch>, so a bare branch name would check out the old local one
 checkout_target() {
@@ -51,6 +52,8 @@ fetch_source() {
 
     # shellcheck disable=SC2034  # read by install.sh
     RESOLVED_REF="$ref"
+    # shellcheck disable=SC2034  # read by install.sh
+    RESOLVED_COMMIT="$(git -C "$source_dir" rev-parse HEAD)"
 }
 
 build_aseprite() {

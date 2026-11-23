@@ -74,9 +74,29 @@ detect_os
 init_log_file "$PREFIX/install.log"
 log_info "full build output goes to $PREFIX/install.log (use --verbose to see it live)"
 
-avail_gb=$(free_space_gb "$HOME")
+# "<ref> <commit> <build type>", fails if the ref can't be resolved yet
+wanted_build_id() {
+    local ref commit
+    ref="${REF:-$(resolve_latest_tag "$SOURCE_DIR")}"
+    [[ -n "$ref" ]] || return 1
+    commit=$(git -C "$SOURCE_DIR" rev-parse --verify --quiet "$(checkout_target "$SOURCE_DIR" "$ref")^{commit}") || return 1
+    echo "$ref $commit $BUILD_TYPE"
+}
+
+wanted_id=""
+if [[ "$REINSTALL" != "1" && -d "$SOURCE_DIR/.git" ]] && has_cmd git; then
+    git -C "$SOURCE_DIR" fetch --tags --prune --quiet origin || log_warn "couldn't reach origin, comparing against the last fetch"
+    wanted_id="$(wanted_build_id)" || wanted_id=""
+fi
+
+if [[ -n "$wanted_id" && -f "$MARKER_FILE" && "$wanted_id" == "$(cat "$MARKER_FILE")" ]]; then
+    log_ok "aseprite ${wanted_id%% *} already installed (${BIN_DIR}/aseprite), use --reinstall to force a rebuild"
+    exit 0
+fi
+
+avail_gb=$(free_space_gb "$PREFIX")
 if [[ -n "$avail_gb" && "$avail_gb" -lt 8 ]]; then
-    log_warn "only ~${avail_gb}GB free under \$HOME, the build typically needs 5-10GB"
+    log_warn "only ~${avail_gb}GB free under $PREFIX, the build typically needs 5-10GB"
     confirm "continue anyway?" || die "aborted"
 fi
 
@@ -85,28 +105,13 @@ if [[ "$SKIP_DEPS" != "1" ]]; then
     check_clang_version
 fi
 
-if [[ "$REINSTALL" != "1" && -f "$MARKER_FILE" ]]; then
-    installed_ref="$(cat "$MARKER_FILE")"
-    if [[ -z "$REF" || "$REF" == "$installed_ref" ]]; then
-        if [[ -z "$REF" ]]; then
-            if [[ -d "$SOURCE_DIR/.git" ]]; then
-                git -C "$SOURCE_DIR" fetch --tags --quiet origin || true
-                latest=$(resolve_latest_tag "$SOURCE_DIR")
-                if [[ -n "$latest" && "$latest" != "$installed_ref" ]]; then
-                    log_info "${installed_ref} -> ${latest}"
-                    REF="$latest"
-                fi
-            fi
-        fi
-        if [[ -z "$REF" || "$REF" == "$installed_ref" ]]; then
-            log_ok "aseprite ${installed_ref} already installed (${BIN_DIR}/aseprite), use --reinstall to force a rebuild"
-            exit 0
-        fi
-    fi
-fi
+for tool in git cmake ninja curl unzip; do
+    has_cmd "$tool" || die "'$tool' not found, install it or drop --skip-deps"
+done
 
 fetch_source "$SOURCE_DIR" "$REF"
 ensure_skia "$SOURCE_DIR"
+build_id="$RESOLVED_REF $RESOLVED_COMMIT $BUILD_TYPE"
 build_aseprite "$SOURCE_DIR" "$SKIA_DIR" "$BUILD_TYPE" "$JOBS"
 
 log_step "installing"
@@ -120,7 +125,7 @@ cp -a "$build_bin_dir/." "$version_dir/"
 
 mkdir -p "$BIN_DIR"
 ln -sf "$version_dir/aseprite" "$BIN_DIR/aseprite"
-echo "$RESOLVED_REF" > "$MARKER_FILE"
+echo "$build_id" > "$MARKER_FILE"
 
 if [[ "$OS_KIND" == "linux" ]]; then
     desktop_dir="$HOME/.local/share/applications"
@@ -149,3 +154,7 @@ EOF
 fi
 
 log_ok "aseprite ${RESOLVED_REF} installed -> ${BIN_DIR}/aseprite"
+
+if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
+    log_warn "$BIN_DIR is not on your PATH, add: export PATH=\"$BIN_DIR:\$PATH\""
+fi
