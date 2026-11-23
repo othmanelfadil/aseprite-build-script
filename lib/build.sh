@@ -56,6 +56,18 @@ fetch_source() {
     RESOLVED_COMMIT="$(git -C "$source_dir" rev-parse HEAD)"
 }
 
+# a build tree from another version keeps stale cmake cache entries and bin/ files
+prepare_build_dir() {
+    local build_dir="$1" build_id="$2"
+    local stamp="$build_dir/.build-id"
+    if [[ -d "$build_dir" && "$(cat "$stamp" 2>/dev/null)" != "$build_id" ]]; then
+        log_info "build directory is from another version, starting clean"
+        rm -rf "$build_dir"
+    fi
+    mkdir -p "$build_dir"
+    echo "$build_id" > "$stamp"
+}
+
 build_aseprite() {
     local source_dir="$1"
     local skia_dir="$2"

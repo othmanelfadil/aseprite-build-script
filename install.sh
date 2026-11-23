@@ -112,6 +112,7 @@ done
 fetch_source "$SOURCE_DIR" "$REF"
 ensure_skia "$SOURCE_DIR"
 build_id="$RESOLVED_REF $RESOLVED_COMMIT $BUILD_TYPE"
+prepare_build_dir "$SOURCE_DIR/build" "$build_id"
 build_aseprite "$SOURCE_DIR" "$SKIA_DIR" "$BUILD_TYPE" "$JOBS"
 
 log_step "installing"
