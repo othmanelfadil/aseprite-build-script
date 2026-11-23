@@ -40,7 +40,7 @@ skia_dir_for_tag() {
 # sets SKIA_DIR instead of echoing it, same reason as fetch_source
 ensure_skia() {
     local source_dir="$1"
-    local tag url zip_path dest_dir
+    local tag url zip_path dest_dir tmp_dir
     tag=$(skia_read_tag "$source_dir")
     dest_dir=$(skia_dir_for_tag "$tag")
     # shellcheck disable=SC2034  # read by install.sh
@@ -54,22 +54,17 @@ ensure_skia() {
     mkdir -p "$SKIA_CACHE_DIR"
     zip_path="${SKIA_CACHE_DIR}/${tag}-${OS_KIND}-${ARCH}.zip"
 
-    log_step "downloading skia ${tag}" >&2
-    local attempt
-    for attempt in 1 2; do
-        if curl -fL --progress-bar -o "$zip_path" "$url"; then
-            break
-        fi
+    log_step "downloading skia ${tag}"
+    if ! curl -fL --retry 2 --retry-delay 2 --progress-bar -o "$zip_path" "$url"; then
         rm -f "$zip_path"
-        if [[ "$attempt" == 2 ]]; then
-            die "failed to download skia from $url after 2 attempts"
-        fi
-        log_warn "download failed, retrying..." >&2
-        sleep 2
-    done
+        die "failed to download skia from $url"
+    fi
 
-    rm -rf "$dest_dir"
-    mkdir -p "$dest_dir"
-    unzip -q "$zip_path" -d "$dest_dir"
+    # dest_dir only appears once it's complete, an interrupted run can't leave a partial cache
+    tmp_dir="${dest_dir}.tmp"
+    rm -rf "$tmp_dir" "$dest_dir"
+    mkdir -p "$tmp_dir"
+    unzip -q "$zip_path" -d "$tmp_dir"
     rm -f "$zip_path"
+    mv "$tmp_dir" "$dest_dir"
 }
