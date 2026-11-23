@@ -2,19 +2,22 @@
 
 set -euo pipefail
 
-REPO_URL="${ASEPRITE_INSTALLER_REPO:-https://github.com/othmanelfadil/aseprite-build-script.git}"
-REF="${ASEPRITE_INSTALLER_REF:-main}"
+main() {
+    local repo_url="${ASEPRITE_INSTALLER_REPO:-https://github.com/othmanelfadil/aseprite-build-script.git}"
+    local ref="${ASEPRITE_INSTALLER_REF:-main}"
 
-if ! command -v git >/dev/null 2>&1; then
-    echo "error: git is required to fetch aseprite-installer" >&2
-    exit 1
-fi
+    if ! command -v git >/dev/null 2>&1; then
+        echo "error: git is required to fetch aseprite-installer" >&2
+        exit 1
+    fi
 
-tmp_dir="$(mktemp -d -t aseprite-installer.XXXXXX)"
-cleanup() { rm -rf "$tmp_dir"; }
-trap cleanup EXIT
+    tmp_dir="$(mktemp -d -t aseprite-installer.XXXXXX)"
+    trap 'rm -rf "$tmp_dir"' EXIT
 
-echo "fetching aseprite-installer (${REF})..." >&2
-git clone --quiet --depth 1 --branch "$REF" "$REPO_URL" "$tmp_dir/repo" >&2
+    echo "fetching aseprite-installer (${ref})..." >&2
+    git clone --quiet --depth 1 --branch "$ref" "$repo_url" "$tmp_dir/repo" >&2
 
-exec "$tmp_dir/repo/install.sh" "$@"
+    "$tmp_dir/repo/install.sh" "$@"
+}
+
+main "$@"
